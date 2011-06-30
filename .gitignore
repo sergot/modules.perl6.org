@@ -3,3 +3,4 @@ config.proto
 *.pir
 cache/*
 *~
+.README.md.swp
