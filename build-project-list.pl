@@ -4,12 +4,18 @@ use warnings;
 use 5.010;
 
 use Data::Dumper;
-use LWP::Simple;
+use Mojo::UserAgent;
+use Mojo::IOLoop;
 use JSON;
 use YAML qw (Load LoadFile);
 use HTML::Template;
 use File::Slurp;
 use Encode qw(encode_utf8);
+
+my $ua = Mojo::UserAgent->new->ioloop(Mojo::IOLoop->new->connect_timeout(10));
+sub get {
+    $ua->get($_[0])->res->body
+}
 
 my $output_dir = shift(@ARGV) || './';
 my @MEDALS = qw<fresh medal readme tests unachieved proto camelia panda>;
@@ -18,18 +24,18 @@ binmode STDOUT, ':encoding(UTF-8)';
 local $| = 1;
 my $stats = { success => 0, failed => 0, errors => [] };
 
-my $list_url = 'http://github.com/perl6/ecosystem/raw/master/META.list';
+my $list_url = 'https://raw.github.com/perl6/ecosystem/master/META.list';
 
 my $site_info = {
     'github' => {
         set_project_info => sub {
 		my ($project , $previous )= @_;
-        $project->{url} = "http://github.com/$project->{auth}/$project->{repo_name}/";
-		if ( ! head( $project ->{url} ) ) {
-			return "Error for project $project->{name} : could not get $project->{url} (project probably dead)\n";
-		}
+        $project->{url} = "https://github.com/$project->{auth}/$project->{repo_name}/";
+#		if ( ! head( $project ->{url} ) ) {
+#			return "Error for project $project->{name} : could not get $project->{url} (project probably dead)\n";
+#		}
 
-		my $commits = decode_json get("http://github.com/api/v2/json/commits/list/$project->{auth}/$project->{repo_name}/master");
+		my $commits = decode_json get("https://github.com/api/v2/json/commits/list/$project->{auth}/$project->{repo_name}/master");
 		my $latest = $commits->{commits}->[0];
 		$project ->{last_updated}= $latest->{committed_date};
 		my ($yyy,$mm,$dd)= (localtime (time - (90*3600*24) ))[5,4,3,] ;  $yyy+=1900;$mm++; #There must be a better way to get yymmdd for 90 days ago
@@ -45,21 +51,21 @@ my $site_info = {
 		}
 		print "Updated since last check\n";
 		
-		my $repository = decode_json get ("http://github.com/api/v2/json/repos/show/$project->{auth}/$project->{repo_name}");
+		my $repository = decode_json get ("https://github.com/api/v2/json/repos/show/$project->{auth}/$project->{repo_name}");
 		$project ->{description}= $repository->{repository}->{description};
 		
-		my $tree = decode_json get("http://github.com/api/v2/json/tree/show/$project->{auth}/$project->{repo_name}/$latest->{id}");
+		my $tree = decode_json get("https://github.com/api/v2/json/tree/show/$project->{auth}/$project->{repo_name}/$latest->{id}");
 		my %files =  map { $_->{name} , $_->{type} } @{ $tree->{tree} };
 		
 		#try to get the logo if any
 		if ( -e "$output_dir/logos" && $files{logotype} ) {
-			my $logo_url = "http://github.com/$project->{auth}/$project->{repo_name}/raw/master/logotype/logo_32x32.png";
-			if ( head($logo_url) ) { 
-				my $logo_name = $project->{name};
-				$logo_name =~ s/\W+/_/;
-				getstore ($logo_url , "$output_dir/logos/$logo_name.png") ; #TODO: unless filesize is same as the one we already have 
-				$project ->{logo} = "./logos/$logo_name.png";
-			}
+			my $logo_url = "https://raw.github.com/$project->{auth}/$project->{repo_name}/master/logotype/logo_32x32.png";
+#			if ( head($logo_url) ) { 
+#				my $logo_name = $project->{name};
+#				$logo_name =~ s/\W+/_/;
+#				getstore ($logo_url , "$output_dir/logos/$logo_name.png") ; #TODO: unless filesize is same as the one we already have 
+#				$project ->{logo} = "./logos/$logo_name.png";
+#			}
 		}
 		
 		$project ->{badge_has_tests} = $files{t} || $files{test} || $files{tests} ;
@@ -124,16 +130,20 @@ sub get_projects {
     my $projects;
     my $contents = eval { read_file('META.list.local') } || get($list_url);
     for my $proj (split "\n", $contents) {
-        my $json = decode_json encode_utf8 get $proj;
-        my $name = $json->{'name'};
-        my $url = $json->{'source-url'} // $json->{'repo-url'};
-        my ($auth, $repo_name)
-            = $url =~ m[git://github.com/([^/]+)/([^.]+).git];
-        $projects->{$name}->{'home'}      = "github";
-        $projects->{$name}->{'auth'}      = $auth;
-        $projects->{$name}->{'repo_name'} = $repo_name;
-        $projects->{$name}->{'url'}  = $url;
-        $projects->{$name}->{'badge_panda'} = defined $json->{'source-url'};
+        print "$proj\n";
+        eval {
+            my $json = decode_json encode_utf8 get $proj;
+            my $name = $json->{'name'};
+            my $url = $json->{'source-url'} // $json->{'repo-url'};
+            my ($auth, $repo_name)
+                = $url =~ m[git://github.com/([^/]+)/([^.]+).git];
+            $projects->{$name}->{'home'}      = "github";
+            $projects->{$name}->{'auth'}      = $auth;
+            $projects->{$name}->{'repo_name'} = $repo_name;
+            $projects->{$name}->{'url'}  = $url;
+            $projects->{$name}->{'badge_panda'} = defined $json->{'source-url'};
+        };
+        warn $@ if $@;
     }
     my $cached_projects = eval { decode_json read_file( $output_dir . 'proto.json' , binmode => ':encoding(UTF-8)' )  };
 
