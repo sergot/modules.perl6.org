@@ -16,6 +16,9 @@ my $ua = Mojo::UserAgent->new->ioloop(Mojo::IOLoop->new->connect_timeout(10));
 sub get {
     $ua->get($_[0])->res->body
 }
+sub head {
+    $ua->get($_[0])->success
+}
 
 my $output_dir = shift(@ARGV) || './';
 my @MEDALS = qw<fresh medal readme tests unachieved proto camelia panda>;
@@ -31,9 +34,9 @@ my $site_info = {
         set_project_info => sub {
 		my ($project , $previous )= @_;
         $project->{url} = "https://github.com/$project->{auth}/$project->{repo_name}/";
-#		if ( ! head( $project ->{url} ) ) {
-#			return "Error for project $project->{name} : could not get $project->{url} (project probably dead)\n";
-#		}
+		if ( ! head( $project ->{url} ) ) {
+			return "Error for project $project->{name} : could not get $project->{url} (project probably dead)\n";
+		}
 
 		my $commits = decode_json get("https://github.com/api/v2/json/commits/list/$project->{auth}/$project->{repo_name}/master");
 		my $latest = $commits->{commits}->[0];
@@ -60,12 +63,12 @@ my $site_info = {
 		#try to get the logo if any
 		if ( -e "$output_dir/logos" && $files{logotype} ) {
 			my $logo_url = "https://raw.github.com/$project->{auth}/$project->{repo_name}/master/logotype/logo_32x32.png";
-#			if ( head($logo_url) ) { 
-#				my $logo_name = $project->{name};
-#				$logo_name =~ s/\W+/_/;
-#				getstore ($logo_url , "$output_dir/logos/$logo_name.png") ; #TODO: unless filesize is same as the one we already have 
-#				$project ->{logo} = "./logos/$logo_name.png";
-#			}
+			if ( head($logo_url) ) { 
+				my $logo_name = $project->{name};
+				$logo_name =~ s/\W+/_/;
+				getstore ($logo_url , "$output_dir/logos/$logo_name.png") ; #TODO: unless filesize is same as the one we already have 
+				$project ->{logo} = "./logos/$logo_name.png";
+			}
 		}
 		
 		$project ->{badge_has_tests} = $files{t} || $files{test} || $files{tests} ;
