@@ -19,6 +19,12 @@ sub get {
 sub head {
     $ua->get($_[0])->success
 }
+sub getstore {
+    open my $f, '>', $_[1] or die "Cannot open '$_[1]' for writing: $!";
+    print { $f } get($_[0]);
+    close $f or warn "Error while closing file '$_[1]': $!";
+    1;
+}
 
 my $output_dir = shift(@ARGV) || './';
 my @MEDALS = qw<fresh medal readme tests unachieved proto camelia panda>;
