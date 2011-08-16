@@ -12,9 +12,15 @@ use HTML::Template;
 use File::Slurp;
 use Encode qw(encode_utf8);
 
+# LWP::Simple doesn't seem to like https, even when IO::Socket::INET
+# and Crypt::SSLeay are installed. So replace its functions with
+# Mojolicious
 my $ua = Mojo::UserAgent->new->ioloop(Mojo::IOLoop->new->connect_timeout(10));
 sub get {
     $ua->get($_[0])->res->body
+}
+sub json_get {
+    $ua->get($_[0])->res->json
 }
 sub head {
     $ua->get($_[0])->success
@@ -44,7 +50,7 @@ my $site_info = {
 			return "Error for project $project->{name} : could not get $project->{url} (project probably dead)\n";
 		}
 
-		my $commits = decode_json get("https://github.com/api/v2/json/commits/list/$project->{auth}/$project->{repo_name}/master");
+		my $commits = json_get("https://github.com/api/v2/json/commits/list/$project->{auth}/$project->{repo_name}/master");
 		my $latest = $commits->{commits}->[0];
 		$project ->{last_updated}= $latest->{committed_date};
 		my ($yyy,$mm,$dd)= (localtime (time - (90*3600*24) ))[5,4,3,] ;  $yyy+=1900;$mm++; #There must be a better way to get yymmdd for 90 days ago
@@ -60,10 +66,10 @@ my $site_info = {
 		}
 		print "Updated since last check\n";
 		
-		my $repository = decode_json get ("https://github.com/api/v2/json/repos/show/$project->{auth}/$project->{repo_name}");
+		my $repository = json_get ("https://github.com/api/v2/json/repos/show/$project->{auth}/$project->{repo_name}");
 		$project ->{description}= $repository->{repository}->{description};
 		
-		my $tree = decode_json get("https://github.com/api/v2/json/tree/show/$project->{auth}/$project->{repo_name}/$latest->{id}");
+		my $tree = json_get("https://github.com/api/v2/json/tree/show/$project->{auth}/$project->{repo_name}/$latest->{id}");
 		my %files =  map { $_->{name} , $_->{type} } @{ $tree->{tree} };
 		
 		#try to get the logo if any
@@ -141,7 +147,7 @@ sub get_projects {
     for my $proj (split "\n", $contents) {
         print "$proj\n";
         eval {
-            my $json = decode_json encode_utf8 get $proj;
+            my $json = json_get $proj;
             my $name = $json->{'name'};
             my $url = $json->{'source-url'} // $json->{'repo-url'};
             my ($auth, $repo_name)
