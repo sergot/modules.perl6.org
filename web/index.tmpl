@@ -110,7 +110,12 @@ dl.table-display {
             <TMPL_IF badge_has_readme><a href="<TMPL_VAR badge_has_readme>"><img src='readme.png' title='Has a README' alt="Readme badge" /></a><TMPL_ELSE><img src='unachieved.png' title="Doesn't have a README" alt="Unachieved badge" /></TMPL_IF>
             <TMPL_IF badge_has_tests><img src='tests.png' title='Has tests' alt="Tests badge" /><TMPL_ELSE><img src='unachieved.png' title="Doesn't have tests" alt="Unachieved badge" /></TMPL_IF>
             <TMPL_IF badge_is_fresh><img src='fresh.png' title='Commits in the past 90 days' alt="Fresh badge" /><TMPL_ELSE><img src='unachieved.png' title='No commits in the past 90 days' alt="Unachieved badge" /></TMPL_IF>
-            <TMPL_IF badge_panda><img src='panda.png' title='Conforms to the latest Perl 6 modules specs' alt="Panda badge" /><TMPL_ELSE><img src='unachieved.png' title='Not quite up-to-date with the specs' alt="Unachieved badge" /></TMPL_IF>
+            <TMPL_IF prereq_ok><img src='good.png' title='All the prerequisites are fine' alt="Prerequisites ok" />
+                <TMPL_ELSE><img src='nope.png' title='Not everything is fine with the prerequisites' alt="Prerequisites not ok" /></TMPL_IF>
+            <TMPL_IF builds_ok><img src='good.png' title='The module builds fine' alt="Build ok" />
+                <TMPL_ELSE><img src='nope.png' title='The module does not build fine' alt="Build not ok" /></TMPL_IF>
+            <TMPL_IF tests_ok><img src='good.png' title='All tests run fine' alt="Tests ok" />
+                <TMPL_ELSE><img src='nope.png' title='Not all tests run fine' alt="Tests not ok" /></TMPL_IF>
         </div>
 	    <TMPL_VAR description></dd>
             </TMPL_IF>

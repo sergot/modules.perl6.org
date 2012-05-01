@@ -37,7 +37,7 @@ sub getstore {
 }
 
 my $output_dir = shift(@ARGV) || './';
-my @MEDALS = qw<fresh medal readme tests unachieved proto camelia panda>;
+my @MEDALS = qw<fresh medal readme tests unachieved proto camelia panda good nope>;
 binmode STDOUT, ':encoding(UTF-8)';
 
 local $| = 1;
@@ -62,7 +62,9 @@ my $site_info = {
 		
 		if ( $previous && $previous->{last_updated} eq $latest->{committed_date} ) {
 			$previous->{badge_is_fresh} = $project->{badge_is_fresh} ; #Even if the project was not modified we need to update this
-            $previous->{badge_panda} = $project->{badge_panda};
+            $previous->{badge_prereq_ok} = $project->{badge_prereq_ok};
+            $previous->{badge_builds_ok} = $project->{badge_builds_ok};
+            $previous->{badge_tests_ok}  = $project->{badge_tests_ok};
 			%$project = %$previous;
 			print "Not updated since last check, loading from cache\n";
 			sleep(1); #We only did one api call
@@ -148,6 +150,9 @@ sub get_projects {
     my ($list_url) = @_;
     my $projects;
     my $contents = eval { read_file('META.list.local') } || get($list_url);
+
+    my $test_results = json_get 'http://tjs.azalayah.net/results.json';
+
     for my $proj (split "\n", $contents) {
         print "$proj\n";
         eval {
@@ -160,7 +165,12 @@ sub get_projects {
             $projects->{$name}->{'auth'}      = $auth;
             $projects->{$name}->{'repo_name'} = $repo_name;
             $projects->{$name}->{'url'}  = $url;
-            $projects->{$name}->{'badge_panda'} = defined $json->{'source-url'};
+
+            my $smoke = $test_results->{$name};
+
+            $projects->{$name}->{'prereq_ok'} = !!$smoke->{'prereq'};
+            $projects->{$name}->{'builds_ok'} = !!$smoke->{'build'};
+            $projects->{$name}->{'tests_ok'}  = !!$smoke->{'test'};
             $projects->{$name}->{'description'} = $json->{'description'};
         };
         warn $@ if $@;
