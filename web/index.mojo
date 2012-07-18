@@ -102,17 +102,37 @@ dl.table-display {
         <h2>Project list</h2>
         <p id="json_link"><a href="proto.json">JSON version of this list</a>.</p>
         <dl class="table-display">
-        % for @^projects -> $project {
-            % if $project.description {
-            <dt><%= if $project.logo { %><img class="project-logo" src="<%= $project.logo %>" alt="<%= $project.name %> logo" /><%= } %><a href="<%= $project.URL %>"><%= $project.name %></a></dt>
+        % for @^projects {
+            % if $_.description {
+            <dt>
+            % if $_.logo {
+                <img class="project-logo" src="<%= $_.logo %>" alt="<%= $_.name %> logo" />
+            % }
+            <a href="<%= $_.URL %>"><%= $_.name %></a></dt>
 	    <dd>
         <div class='badges'>
-            <%= if $project.has_readme { %><a href="<%= $project.readme %>"><img src='readme.png' title='Has a README' alt="Readme badge" /></a><%= } else { %><img src='unachieved.png' title="Doesn't have a README" alt="Unachieved badge" /><%= } %>
-            <%= if $project.has_tests { %><img src='tests.png' title='Has tests' alt="Tests badge" /><%= } else { %><img src='unachieved.png' title="Doesn't have tests" alt="Unachieved badge" /><%= } %>
-            <%= if $project.is_fresh { %><img src='fresh.png' title='Commits in the past 90 days' alt="Fresh badge" /><%= } else { %><img src='unachieved.png' title='No commits in the past 90 days' alt="Unachieved badge" /><%= } %>
-            <%= if $project.panda { %><img src='panda.png' title='Conforms to the latest Perl 6 modules specs' alt="Panda badge" /><%= } else { %><img src='unachieved.png' title='Not quite up-to-date with the specs' alt="Unachieved badge" /><%= } %>
+            % if $_.has_readme {
+                <a href="<%= $_.readme %>"><img src='readme.png' title='Has a README' alt="Readme badge" /></a>
+            % } else {
+            <img src='unachieved.png' title="Doesn't have a README" alt="Unachieved badge" />
+            % }
+            % if $_.has_tests {
+                <img src='tests.png' title='Has tests' alt="Tests badge" />
+            % } else {
+                <img src='unachieved.png' title="Doesn't have tests" alt="Unachieved badge" />
+            % }
+            % if $_.is_fresh {
+                <img src='fresh.png' title='Commits in the past 90 days' alt="Fresh badge" />
+            % } else {
+                <img src='unachieved.png' title='No commits in the past 90 days' alt="Unachieved badge" />
+            % }
+            % if $_.panda {
+                <img src='panda.png' title='Conforms to the latest Perl 6 modules specs' alt="Panda badge" />
+            % } else {
+                <img src='unachieved.png' title='Not quite up-to-date with the specs' alt="Unachieved badge" />
+            % }
         </div>
-	    <%= $project.description %></dd>
+	    <%= $_.description %></dd>
             % } # if
         % } # for
         </dl>
