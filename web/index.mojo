@@ -102,9 +102,9 @@ dl.table-display {
         <h2>Project list</h2>
         <p id="json_link"><a href="proto.json">JSON version of this list</a>.</p>
         <dl class="table-display">
-% my %args = @_[0];
-% my (@projects, $last_update) = (%args<projects>, %args<last_update>);
-% for @projects[0][0] {
+% my ($projects, $last_update) = @_;
+% for $projects.list -> $p {
+%     my $_ = $p[0]; # don't even ask me wtf it's doing
 %     if $_.description {
             <dt>
 %         if $_.logo {
@@ -127,11 +127,6 @@ dl.table-display {
                 <img src='fresh.png' title='Commits in the past 90 days' alt="Fresh badge" />
 %         } else {
                 <img src='unachieved.png' title='No commits in the past 90 days' alt="Unachieved badge" />
-%         }
-%         if $_.panda {
-                <img src='panda.png' title='Conforms to the latest Perl 6 modules specs' alt="Panda badge" />
-%         } else {
-                <img src='unachieved.png' title='Not quite up-to-date with the specs' alt="Unachieved badge" />
 %         }
         </div>
 	    <%= $_.description %></dd>

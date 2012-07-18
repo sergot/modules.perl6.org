@@ -1,32 +1,27 @@
 use v6;
 use Template::Mojo;
+use JSON::Tiny;
 
-sub render($tmpl, *@a) {
-    Template::Mojo.new($tmpl).render(|@a);
-}
-
-my $file = slurp 'index.mojo';
+my $tmpl = slurp 'index.mojo';
 
 class Project {
-    has $.has_readme = True;
-    has $.readme = True;
-
-    has $.is_fresh = True;
-    has $.panda = True;
-    has $.description = True;
-    has $.logo = True;
-
-    has $.has_tests = True;
-
-    has $.name = True;
-    has $.URL = True;
+    has $.has_readme  = False;
+    has $.readme      = False;
+    has $.is_fresh    = False;
+    has $.logo        = False;
+    has $.has_tests   = False;
+    has $.description = "this project has no description";
+    has $.name        = die "Every project needs a name";
+    has $.URL         = die "Every project needs an URL";
 }
 
-my @projects;
-@projects.push: Project.new;
-@projects.push: Project.new;
-my $last_update = 'dzisiaj';
+my $projects = from-json(slurp("projects.json")).map: {
+    Project.new(name => $_<name>, description => $_<description>,
+                URL  => ($_<source-url>//$_<repo-url>)\
+                                      .subst(/^git/, 'http')\
+                                      .subst(/\.git$/, ''))
+}
 
-say @projects.perl;
+my $last_update = DateTime.now.Str;
 
-say render($file, { :@projects, :$last_update })
+Template::Mojo.new($tmpl).render($projects, $last_update).say;
