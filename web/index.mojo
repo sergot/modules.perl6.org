@@ -107,7 +107,7 @@ dl.table-display {
             <dt><%= if $project.logo { %><img class="project-logo" src="<%= $project.logo %>" alt="<%= $project.name %> logo" /><%= } %><a href="<%= $project.URL %>"><%= $project.name %></a></dt>
 	    <dd>
         <div class='badges'>
-            <%= if $project.has_readme { %><a href="<TMPL_VAR badge_has_readme>"><img src='readme.png' title='Has a README' alt="Readme badge" /></a><%= } else { %><img src='unachieved.png' title="Doesn't have a README" alt="Unachieved badge" /><%= } %>
+            <%= if $project.has_readme { %><a href="<%= $project.readme %>"><img src='readme.png' title='Has a README' alt="Readme badge" /></a><%= } else { %><img src='unachieved.png' title="Doesn't have a README" alt="Unachieved badge" /><%= } %>
             <%= if $project.has_tests { %><img src='tests.png' title='Has tests' alt="Tests badge" /><%= } else { %><img src='unachieved.png' title="Doesn't have tests" alt="Unachieved badge" /><%= } %>
             <%= if $project.is_fresh { ><img src='fresh.png' title='Commits in the past 90 days' alt="Fresh badge" /><%= } else { %><img src='unachieved.png' title='No commits in the past 90 days' alt="Unachieved badge" /><%= } %>
             <%= if $project.panda { %><img src='panda.png' title='Conforms to the latest Perl 6 modules specs' alt="Panda badge" /><% } else { %><img src='unachieved.png' title='Not quite up-to-date with the specs' alt="Unachieved badge" /><%= } %>
@@ -119,7 +119,7 @@ dl.table-display {
         <p style="clear:both; padding-top: 2em">
         This page is generated from the files in the <a
         href="http://github.com/perl6/modules.perl6.org/">modules.perl6.org
-        repository</a><br/>(<i>last update <TMPL_VAR last_update></i>).</p>
+        repository</a><br/>(<i>last update <%= $last_update %></i>).</p>
         <p>For feedback and patches, please contact us
         through the <a href="http://perl6.org/community/irc">#perl6 IRC
         channel</a>, or send an email to the perl6-compiler@perl.org mailing
