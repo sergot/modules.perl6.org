@@ -8,7 +8,7 @@ class Project {
     has $.logo is rw        = False;
     has $.description is rw = "this project has no description";
     has $.name is rw  = False; #die "Every project needs a name";
-    has $.URL is rw         = False; #die "Every project needs an URL";
+    has $.URL is rw         = die "Every project needs an URL";
     has $.gitname;
 
     method has_readme() {
@@ -40,9 +40,9 @@ class Project {
         
         try {
             my $item = from-json(slurp "$.gitname/META.info")[0];
-        $.name = $item<name>;
-        $.description = $item<description>;
-    }
+            $.name = $item<name>;
+            $.description = $item<description>;
+        }
         $.URL ~~ s/git\:\/\//https\:\/\//;
         $.URL ~~ s/\.git//;
 
