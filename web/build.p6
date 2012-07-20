@@ -29,13 +29,17 @@ class Project {
         $url ~~ s:g/\//\\\//;
 
         eval "qx/ git clone $url /";
-        #$gitname.IO.e ?? eval "qx/ cd $gitname; git pull /" !! eval "qx/ git clone $url /";
+        #$gitname.IO.e ?? eval "qx/ cd $gitname; git pull /" !! eval "qx/ git clone $url /"; too slow
 
+        my $item;
         try {
-            my $item = from-json(slurp "$!gitname/META.info")[0];
-            $!name = $item<name> or "error";
-            $!description = $item<description>;
+            $item = from-json(slurp "$!gitname/META.info")[0];
         }
+
+        $!name = $item<name> or "error";
+        say $!name;
+        $!description = $item<description> or "error";
+
         $!URL ~~ s/git\:\/\//https\:\/\//;
         $!URL ~~ s/\.git//;
 
