@@ -8,5 +8,5 @@ my $tmpl = slurp "index.mojo";
 my $projects = from-json(slurp("../proto.json")).values;
 
 my $index = open "../index.html", :w;
-$index.say: Template::Mojo.new($tmpl).render($projects.list.sort( *<name>).item, $last_update);
+$index.say: Template::Mojo.new($tmpl).render($projects.list.sort( *.<name>).item, $last_update);
 $index.close;
