@@ -103,8 +103,7 @@ dl.table-display {
         <p id="json_link"><a href="proto.json">JSON version of this list</a>.</p>
         <dl class="table-display">
 % my ($projects, $last_update) = @_;
-% for $projects.list -> $p {
-%     my $_ = $p[0]; # don't even ask me wtf it's doing
+% for $projects.list {
 %     if $_.description {
             <dt>
 %         if $_.logo {
@@ -113,7 +112,7 @@ dl.table-display {
             <a href="<%= $_.URL %>"><%= $_.name %></a></dt>
 	    <dd>
         <div class='badges'>
-%         if $_.has_readme {
+%         if $_.readme {
                 <a href="<%= $_.readme %>"><img src='readme.png' title='Has a README' alt="Readme badge" /></a>
 %         } else {
             <img src='unachieved.png' title="Doesn't have a README" alt="Unachieved badge" />
