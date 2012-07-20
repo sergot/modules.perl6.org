@@ -29,6 +29,9 @@ class Project {
     }
 
     method is_fresh() {
+        if eval("qx[ cd $.gitname; git log -n 1 --format='%ci' ]") ~~ m/^(\d\d\d\d)\-(\d\d)\-(\d\d)\s+/ {
+            return True if ((Date.today - Date.new(+$0, +$1, +$2)) <= 90);
+        }
         return False;
     }
 
@@ -36,7 +39,7 @@ class Project {
         my $url = $.URL;
         $url ~~ s:g/\//\\\//;
 
-        eval "qx/ git clone $url /";
+        $.gitname.IO.e ?? eval "qx/ cd $.gitname; git pull /" !! eval "qx/ git clone $url /";
         
         try {
             my $item = from-json(slurp "$.gitname/META.info")[0];
