@@ -96,13 +96,6 @@ my $projects = slurp("modules.list").split("\n").map: {
     $p;
 }
 
-#my $last_update = DateTime.now.Str;
-#my $tmpl = slurp "index.mojo";
-
-#my $index = open "../index.html", :w;
-#$index.say: Template::Mojo.new($tmpl).render($projects.list.sort( *.name).item, $last_update);
-#$index.close;
-
 my $json = open "../proto.json", :w;
 my %all;
 %all.push(.gitname => .to_hash) for $projects.list;
