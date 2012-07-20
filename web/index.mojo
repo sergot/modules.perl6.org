@@ -104,37 +104,37 @@ dl.table-display {
         <dl class="table-display">
 % my ($projects, $last_update) = @_;
 % for $projects.list {
-%     if $_.description {
+%     if $_<description> {
             <dt>
-%         if $_.logo {
-                <img class="project-logo" src="<%= $_.logo %>" alt="<%= $_.name %> logo" />
+%         if $_<logo> {
+                <img class="project-logo" src="<%= $_<logo> %>" alt="<%= $_<name> %> logo" />
 %         }
-            <a href="<%= $_.URL %>"><%= $_.name %></a></dt>
+            <a href="<%= $_<URL> %>"><%= $_<name> %></a></dt>
 	    <dd>
         <div class='badges'>
-%         if $_.readme {
-                <a href="<%= $_.readme %>"><img src='readme.png' title='Has a README' alt="Readme badge" /></a>
+%         if $_<readme> {
+                <a href="<%= $_<readme> %>"><img src='readme.png' title='Has a README' alt="Readme badge" /></a>
 %         } else {
             <img src='unachieved.png' title="Doesn't have a README" alt="Unachieved badge" />
 %         }
-%         if $_.has_tests {
+%         if $_<has_tests> {
                 <img src='tests.png' title='Has tests' alt="Tests badge" />
 %         } else {
                 <img src='unachieved.png' title="Doesn't have tests" alt="Unachieved badge" />
 %         }
-%         if $_.is_fresh {
+%         if $_<is_fresh> {
                 <img src='fresh.png' title='Commits in the past 90 days' alt="Fresh badge" />
 %         } else {
                 <img src='unachieved.png' title='No commits in the past 90 days' alt="Unachieved badge" />
 %         }
-%         my $tests = $_.test-results;
+%         my $tests = $_<test-results>;
           <span
-              style="font-size:32px;color:<%= $tests.key %>">
+              style="font-size:32px;color:<%= $tests.keys[0] %>">
           <abbr title="<%= sprintf 'Test results for %s: %s',
-                                    $_.name, $tests.value %>">●</abbr>
+                                    $_<name>, $tests.values[0] %>">●</abbr>
           </span>
         </div>
-	    <%= $_.description %></dd>
+	    <%= $_<description> %></dd>
 %     } # if
 % } # for
         </dl>
