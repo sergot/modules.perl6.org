@@ -37,7 +37,6 @@ class Project {
         }
 
         $!name = $item<name> or "error";
-        say $!name;
         $!description = $item<description> or "error";
 
         $!URL ~~ s/git\:\/\//https\:\/\//;
