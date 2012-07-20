@@ -4,12 +4,13 @@ use JSON::Tiny;
 use File::Path;
 
 class Project {
-    has $.readme is rw      = False;
-    has $.logo is rw        = False;
-    has $.description is rw = "this project has no description";
-    has $.name is rw  = False; #die "Every project needs a name";
-    has $.URL is rw         = die "Every project needs an URL";
-    has $.gitname;
+    has $.URL       = die "Every project needs an URL";
+    has $.gitname   = die "Every project needs an gitname";
+
+    has $.name;
+    has $.readme;
+    has $.logo;
+    has $.description;
 
     method has_tests() {
         return True if "$.gitname/t".IO.e;
@@ -23,39 +24,41 @@ class Project {
         return False;
     }
 
-    method new(:$URL is copy, :$gitname) {
-        my $url = $URL;
-        my ($name, $description, $logo);
+    submethod BUILD(:$!URL, :$!gitname, :$!name, :$!description, :$!logo, :$!readme) {
+        my $url = $!URL;
         $url ~~ s:g/\//\\\//;
 
         eval "qx/ git clone $url /";
         #$gitname.IO.e ?? eval "qx/ cd $gitname; git pull /" !! eval "qx/ git clone $url /";
 
         try {
-            my $item = from-json(slurp "$gitname/META.info")[0];
-            $name = $item<name>;
-            $description = $item<description>;
+            my $item = from-json(slurp "$!gitname/META.info")[0];
+            $!name = $item<name> or "error";
+            $!description = $item<description>;
         }
-        $URL ~~ s/git\:\/\//https\:\/\//;
-        $URL ~~ s/\.git//;
+        $!URL ~~ s/git\:\/\//https\:\/\//;
+        $!URL ~~ s/\.git//;
 
-        $logo = $URL~"/raw/master/logotype/logo_32x32.png" if "$gitname/logotype/logo_32x32.png".IO.e;
+        $!logo = $!URL~"/raw/master/logotype/logo_32x32.png" if "$!gitname/logotype/logo_32x32.png".IO.e;
 
-        my $readme_file = readme_file($gitname);
-        my $readme = $readme_file ?? $URL~"/blob/master/"~$readme_file !! False; 
-
-        self.bless(*, :$URL, :$gitname, :$logo, :$name, :$readme, :$description);
+        my $readme_file = readme_file($!gitname);
+        $!readme = $readme_file ?? $!URL~"/blob/master/"~$readme_file !! False; 
     }
 
     sub readme_file(Str $path) {
-        "$path/README".IO.e ?? "README" !! "$path/README.md".IO.e ?? "README.md" !! "$path/README.markdown".IO.e ?? "README.markdown" !! "$path/README.mkd".IO.e ?? "README.mkd" !! False;
+        for "", ".md", ".markdown", ".mkd" {
+            return "README$_" if "$path/README$_".IO.e for "", ".md", ".markdown", ".mkd";
+        }
     }
 
     method to_hash {
         my %hash =  "name" => $.name,
+                    "URL" => $.URL,
                     "gitname" => $.gitname,
                     "readme" => $.readme,
+                    "description" => $.description,
                     "has_tests" => self.has_tests,
+                    "is_fresh" => self.is_fresh,
                     "logo" => $.logo;
         return %hash;
     }
