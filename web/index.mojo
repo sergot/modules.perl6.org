@@ -127,6 +127,12 @@ dl.table-display {
 %         } else {
                 <img src='unachieved.png' title='No commits in the past 90 days' alt="Unachieved badge" />
 %         }
+%         my $tests = $_.test-results;
+          <span
+              style="font-size:32px;color:<%= $tests.key %>">
+          <abbr title="<%= sprintf 'Test results for %s: %s',
+                                    $_.name, $tests.value %>">●</abbr>
+          </span>
         </div>
 	    <%= $_.description %></dd>
 %     } # if

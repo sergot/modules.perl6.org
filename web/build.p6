@@ -1,7 +1,6 @@
 use v6;
 use Template::Mojo;
 use JSON::Tiny;
-use File::Path;
 
 class Project {
     has $.URL       = die "Every project needs an URL";
@@ -11,6 +10,8 @@ class Project {
     has $.readme;
     has $.logo;
     has $.description;
+
+    has Pair $.test-results is rw; # colour => description
 
     method has_tests() {
         return True if "$.gitname/t".IO.e;
@@ -67,9 +68,35 @@ class Project {
     }
 }
 
+my %test-results = from-json(slurp("results.json"));
+
 my $projects = slurp("modules.list").split("\n").map: {
-    Project.new(URL => $_, gitname => ~$/[0]) if /\/\/.*?\/.*?\/(.*?)\.git/;
+    say $_;
+    my $p = Project.new(URL => $_, gitname => ~$/[0]) if /\/\/.*?\/.*?\/(.*?)\.git/;
+    next unless $p;
+    say $p.perl;
+    next unless $p.name;
+    next unless %test-results{$p.name};
+    $p.test-results = do given %test-results{$p.name} {
+        when .<prereq> == False {
+            red => 'Could not resolve dependencies'
+        }
+        when .<build> == False {
+            red => 'Did not build successfully'
+        }
+        when .<test> == False {
+            red => 'Some tests have failed'
+        }
+        when $p.has_tests == False {
+            yellow => 'Has no tests'
+        }
+        default {
+            green => 'Everything all right'
+        }
+    }
+    $p;
 }
+
 my $last_update = DateTime.now.Str;
 my $tmpl = slurp "index.mojo";
 
