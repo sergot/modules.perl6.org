@@ -2,11 +2,13 @@ use v6;
 use JSON::Tiny;
 use Template::Mojo;
 
+my $site_dir = '/home/user/public_html/modules/';
+
 my $last_update = DateTime.now.Str;
 my $tmpl = slurp "index.mojo";
 
-my $projects = from-json(slurp("../proto.json")).values;
+my $projects = from-json(slurp("proto.json")).values;
 
-my $index = open "../index.html", :w;
+my $index = open "$site_dir/index.html", :w;
 $index.say: Template::Mojo.new($tmpl).render($projects.list.sort(*.<name>).item, $last_update);
 $index.close;

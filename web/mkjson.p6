@@ -1,6 +1,8 @@
 use v6;
-#use Template::Mojo;
 use JSON::Tiny;
+
+my $download_dir = '.';
+my $emmentaler_dir = '..';
 
 class Project {
     has $.URL       = die "Every project needs an URL";
@@ -10,16 +12,17 @@ class Project {
     has $.readme;
     has $.logo;
     has $.description;
+    has $!path;
 
     has Pair $.test-results is rw; # colour => description
 
     method has_tests() {
-        return True if "$.gitname/t".IO.e;
+        return True if "$!path/t".IO.e;
         return False;
     }
 
     method is_fresh() {
-        if qqx[ cd $.gitname; git log -n 1 --format='%ci' ] ~~ m/^(\d\d\d\d)\-(\d\d)\-(\d\d)\s+/ {
+        if qqx[ cd $!path; git log -n 1 --format='%ci' ] ~~ m/^(\d\d\d\d)\-(\d\d)\-(\d\d)\s+/ {
             return True if ((Date.today - Date.new(+$0, +$1, +$2)) <= 90);
         }
         return False;
@@ -29,12 +32,14 @@ class Project {
         my $url = $!URL;
         $url ~~ s:g/\//\\\//;
 
-        qqx/ git clone $url /;
-        #$gitname.IO.e ?? eval "qx/ cd $gitname; git pull /" !! eval "qx/ git clone $url /"; too slow
+        $!path = $download_dir ~ $!gitname;
+
+        qqx/ git clone $url $!path /;
+        #$!gitname.IO.e ?? eval "qx/ cd $!path; git pull /" !! eval "qx/ git clone $url $!path /"; # too slow
 
         my $item;
         try {
-            $item = from-json(slurp "$!gitname/META.info")[0];
+            $item = from-json(slurp "$!path/META.info")[0];
         }
 
         $!name = $item<name> or "error";
@@ -43,9 +48,9 @@ class Project {
         $!URL ~~ s/git\:\/\//https\:\/\//;
         $!URL ~~ s/\.git//;
 
-        $!logo = $!URL~"/raw/master/logotype/logo_32x32.png" if "$!gitname/logotype/logo_32x32.png".IO.e;
+        $!logo = $!URL~"/raw/master/logotype/logo_32x32.png" if "$!path/logotype/logo_32x32.png".IO.e;
 
-        my $readme_file = readme_file($!gitname);
+        my $readme_file = readme_file($!path);
         $!readme = $readme_file ?? $!URL~"/blob/master/"~$readme_file !! False; 
     }
 
@@ -69,7 +74,7 @@ class Project {
     }
 }
 
-my %test-results = from-json(slurp("results.json"));
+my %test-results = from-json(slurp("$emmentaler_dir/results.json"));
 
 my $projects = slurp("modules.list").split("\n").map: {
     my $p = Project.new(URL => $_, gitname => ~$/[0]) if /\/\/.*?\/.*?\/(.*?)\.git/;
@@ -96,8 +101,11 @@ my $projects = slurp("modules.list").split("\n").map: {
     $p;
 }
 
-my $json = open "../proto.json", :w;
+my $json = open "proto.json", :w;
 my %all;
 %all.push(.gitname => .to_hash) for $projects.list;
 $json.say: to-json(%all);
 $json.close;
+
+# generating single module page
+# TODO
