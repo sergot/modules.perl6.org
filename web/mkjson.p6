@@ -54,7 +54,7 @@ class Project {
 
         my $readme_file = readme_file($!path);
         $!readme = $readme_file ?? $!URL~"/blob/master/"~$readme_file !! False; 
-        $!readme_content = slurp "$!path/$readme_file" if $readme;
+        $!readme_content = slurp "$!path/$readme_file" if $!readme;
     }
 
     sub readme_file(Str $path) {
