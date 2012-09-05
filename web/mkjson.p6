@@ -10,8 +10,10 @@ class Project {
 
     has $.name;
     has $.readme;
+    has $.readme_content;
     has $.logo;
     has $.description;
+
     has $!path;
 
     has Pair $.test-results is rw; # colour => description
@@ -52,6 +54,7 @@ class Project {
 
         my $readme_file = readme_file($!path);
         $!readme = $readme_file ?? $!URL~"/blob/master/"~$readme_file !! False; 
+        $!readme_content = slurp "$!path/$readme_file";
     }
 
     sub readme_file(Str $path) {
@@ -65,6 +68,7 @@ class Project {
                     "URL" => $.URL,
                     "gitname" => $.gitname,
                     "readme" => $.readme,
+                    "readme_content" => $.readme_content,
                     "description" => $.description,
                     "has_tests" => self.has_tests,
                     "is_fresh" => self.is_fresh,
