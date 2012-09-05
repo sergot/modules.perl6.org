@@ -16,8 +16,10 @@
 			<a href="https://github.com/perl6/mu/blob/master/misc/camelia.txt"><img alt="camelia perl bug logo" src="http://perl6.org/camelia-logo.png" /></a>
 			<h1><a href="/">Perl 6 Modules</a></h1>
             <h2>
+            % if $m<logo> {
                 <img class="project-logo" alt="<%= $m<name> %> logo"
                      src="<%= $m<logo> %>">
+            % }
                 <%= $m<name> %>
             </h2>
             <h3> <%= $m<description> %> </h2>
@@ -25,11 +27,11 @@
         <div id="content">
         <p>
         <%= $m<name> %> on Github:
-            <a href="<%= $m<url> %>"> <%= $m<url> %> </a>
+            <a href="<%= $m<URL> %>"><%= $m<URL> %></a>
         <p>
         <h3> Readme </h3>
         <p><pre>
-<%= $m<readme> %>
+<%= $m<readme_content> %>
         </pre></p>
 
      </div>
