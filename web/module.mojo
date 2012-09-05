@@ -30,10 +30,15 @@
             <a href="<%= $m<URL> %>"><%= $m<URL> %></a>
         <p>
         <h3> Readme </h3>
-        <p><pre>
+        <p>
+% if $m<readme> {
+        <pre>
 <%= $m<readme_content> %>
-        </pre></p>
-
+        </pre>
+% } else {
+        There is no README file! :(
+% }
+        </p>
      </div>
     </body>
 </html>
