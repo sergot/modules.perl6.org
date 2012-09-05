@@ -34,7 +34,7 @@ class Project {
         my $url = $!URL;
         $url ~~ s:g/\//\\\//;
 
-        $!path = $download_dir ~ $!gitname;
+        $!path = "$download_dir/$!gitname";
 
         qqx/ git clone $url $!path /;
         #$!gitname.IO.e ?? eval "qx/ cd $!path; git pull /" !! eval "qx/ git clone $url $!path /"; # too slow
