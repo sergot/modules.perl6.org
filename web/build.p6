@@ -13,8 +13,9 @@ my $index = open "$site_dir/index.html", :w;
 $index.say: Template::Mojo.new($tmpl).render($projects.list.sort(*.<name>).item, $last_update);
 $index.close;
 
+$tmpl = slurp "module.mojo";
 for $projects.list -> $p {
     my $m = open "$site_dir/module/{$p<name>}.html", :w;
-    $m.say: Template::Mojo.new(slurp "module.mojo").render($p);
+    $m.say: Template::Mojo.new($tmpl).render($p);
     $m.close;
 }
