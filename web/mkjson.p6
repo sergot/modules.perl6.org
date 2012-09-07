@@ -3,6 +3,9 @@ use JSON::Tiny;
 
 my $download_dir = '.';
 my $emmentaler_dir = '..';
+my $site_dir = '/home/user/public_html/modules';
+my $fullpath = '/home/user/perl6/modules.perl6.org';
+my $ecosystem_dir = "$fullpath/web";
 
 class Project {
     has $.URL       = die "Every project needs an URL";
@@ -80,7 +83,7 @@ class Project {
 
 my %test-results = from-json(slurp("$emmentaler_dir/results.json"));
 
-my $projects = slurp("modules.list").split("\n").map: {
+my $projects = slurp("$ecosystem_dir/modules.list").split("\n").map: {
     my $p = Project.new(URL => $_, gitname => ~$/[0]) if /\/\/.*?\/.*?\/(.*?)\.git/;
     next unless $p;
     next unless $p.name;
@@ -105,7 +108,7 @@ my $projects = slurp("modules.list").split("\n").map: {
     $p;
 }
 
-my $json = open "proto.json", :w;
+my $json = open "$site_dir/proto.json", :w;
 my %all;
 %all.push(.gitname => .to_hash) for $projects.list;
 $json.say: to-json(%all);
