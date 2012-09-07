@@ -75,7 +75,7 @@ dl.table-display {
     <body>
 		<div id="header">
 			<a href="https://github.com/perl6/mu/blob/master/misc/camelia.txt"><img alt="camelia perl bug logo" src="http://perl6.org/camelia-logo.png" /></a>
-			<h1><a href="/">Perl 6 Modules</a></h1>
+			<h1><a href="#">Perl 6 Modules</a></h1>
 		</div>
         <div id="content">
         <div id="about">
@@ -148,7 +148,7 @@ dl.table-display {
         list.
         </p>
         <p>Want to know how to score badges? Read up on
-           <a href="fame-and-profit">how to achieve fame and profit</a>!</p>
+           <a href="fame-and-profit.html">how to achieve fame and profit</a>!</p>
      </div>
     </body>
 </html>
