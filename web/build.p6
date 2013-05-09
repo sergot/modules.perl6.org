@@ -2,8 +2,8 @@ use v6;
 use JSON::Tiny;
 use Template::Mojo;
 
-my $site_dir = '/home/user/public_html/modules';
-my $fullpath = '/home/user/perl6/modules.perl6.org';
+my $site_dir = '/home/sergot/public_html/modules';
+my $fullpath = '/home/sergot/modules.perl6.org';
 
 my $last_update = DateTime.now.Str;
 my $tmpl = slurp "$fullpath/web/index.mojo";
@@ -16,7 +16,9 @@ $index.close;
 
 $tmpl = slurp "$fullpath/web/module.mojo";
 for $projects.list -> $p {
-    my $m = open "$site_dir/module/{$p<name>}.html", :w;
-    $m.say: Template::Mojo.new($tmpl).render($p);
-    $m.close;
+    if $p {
+        my $m = open "$site_dir/module/{$p<name>}.html", :w;
+        $m.say: Template::Mojo.new($tmpl).render($p);
+        $m.close;
+    }
 }

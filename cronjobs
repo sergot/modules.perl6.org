@@ -1,0 +1,6 @@
+0 0 * * * wget http://feather.perl6.nl:3000/projects.json -O /home/sergot/emmentaler/projects.list
+5 0 * * * /home/p6eval/star/bin/perl6 /home/sergot/emmentaler/smoker /home/sergot/emmentaler/projects.list > /home/sergot/public_html/modules/err1 2>&1
+0 * * * * /home/p6eval/star/bin/perl6 /home/sergot/ecosystem/remake.p6 > /home/sergot/ecosystem/modules.list 
+20 * * * * /home/p6eval/star/bin/perl6 /home/sergot/modules.perl6.org/web/mkjson.p6 > /home/sergot/public_html/modules/err2 2>&1
+40 * * * * /home/p6eval/star/bin/perl6 /home/sergot/modules.perl6.org/web/build.p6 > /home/sergot/public_html/modules/err3 2>&1
+

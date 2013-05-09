@@ -1,11 +1,11 @@
 use v6;
 use JSON::Tiny;
 
-my $download_dir = '.';
-my $emmentaler_dir = '..';
-my $site_dir = '/home/user/public_html/modules';
-my $fullpath = '/home/user/perl6/modules.perl6.org';
-my $ecosystem_dir = "$fullpath/web";
+my $download_dir = '/home/sergot/modules.perl6.org/web';
+my $emmentaler_dir = '/home/sergot/emmentaler';
+my $site_dir = '/home/sergot/public_html/modules';
+my $fullpath = '/home/sergot/modules.perl6.org';
+my $ecosystem_dir = "/home/sergot/ecosystem";
 
 class Project {
     has $.URL       = die "Every project needs an URL";
@@ -61,9 +61,8 @@ class Project {
     }
 
     sub readme_file(Str $path) {
-        for "", ".md", ".markdown", ".mkd" {
             return "README$_" if "$path/README$_".IO.e for "", ".md", ".markdown", ".mkd", ".mkdn", ".pod";
-        }
+            return Mu
     }
 
     method to_hash {
@@ -113,6 +112,3 @@ my %all;
 %all.push(.gitname => .to_hash) for $projects.list;
 $json.say: to-json(%all);
 $json.close;
-
-# generating single module page
-# TODO

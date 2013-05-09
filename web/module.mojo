@@ -85,14 +85,14 @@ dl.table-display {
                 <img class="project-logo" alt="<%= $m<name> %> logo"
                      src="<%= $m<logo> %>">
             % }
-                <%= $m<name> %>
+                <a href="<%= $m<URL> %>" target="_blank"><%= $m<name> %></a>
             </h2>
             <h3> <%= $m<description> %> </h2>
 		</div>
         <div id="content">
         <p>
         <%= $m<name> %> on Github:
-            <a href="<%= $m<URL> %>"><%= $m<URL> %></a>
+            <a href="<%= $m<URL> %>" target="_blank"><%= $m<URL> %></a>
         <p>
         <h3> Readme </h3>
         <p>
